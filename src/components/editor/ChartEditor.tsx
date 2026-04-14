@@ -9,7 +9,7 @@ import { exportMermaidAsSvg, exportMermaidAsPng, downloadSvg } from '../../utils
 export default function ChartEditor() {
   const { projectId } = useParams<{ projectId: string }>()
   const navigate = useNavigate()
-  const { getProject, updateProject, currentProject, setCurrentProject } = useProjectStore()
+  const { getProject, currentProject, setCurrentProject } = useProjectStore()
   const [content, setContent] = useState('')
   const [showHistory, setShowHistory] = useState(false)
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
@@ -41,13 +41,6 @@ export default function ChartEditor() {
       }
     }
   }, [projectId, getProject, setCurrentProject, navigate])
-
-  const handleContentChange = (newContent: string) => {
-    setContent(newContent)
-    if (currentProject) {
-      updateProject(currentProject.id, { content: newContent })
-    }
-  }
 
   const handleRestore = (restoredContent: string) => {
     setContent(restoredContent)

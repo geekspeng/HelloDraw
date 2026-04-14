@@ -1,33 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { Excalidraw } from '@excalidraw/excalidraw'
 
 interface ExcalidrawCanvasProps {
   initialData?: string
-  onChange?: (data: any) => void
 }
 
-export default function ExcalidrawCanvas({ initialData, onChange }: ExcalidrawCanvasProps) {
+export default function ExcalidrawCanvas({ initialData }: ExcalidrawCanvasProps) {
   const [viewMode, setViewMode] = useState(false)
-  const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null)
 
-  useEffect(() => {
-    // Initialize with data if provided
-    if (initialData && excalidrawAPI) {
-      try {
-        const parsed = JSON.parse(initialData)
-        excalidrawAPI.resetScene(parsed)
-      } catch (e) {
-        // ignore parse errors
-      }
-    }
-  }, [initialData, excalidrawAPI])
-
-  const handleChange = (elements: any[]) => {
-    if (onChange && excalidrawAPI) {
-      const scene = excalidrawAPI.getScene()
-      onChange(scene)
-    }
-  }
+  const initialAppState = initialData ? { ...JSON.parse(initialData) } : undefined
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -48,8 +29,7 @@ export default function ExcalidrawCanvas({ initialData, onChange }: ExcalidrawCa
       <div className="flex-1 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
         <Excalidraw
           viewModeEnabled={viewMode}
-          onChange={handleChange}
-          onInit={(api: any) => setExcalidrawAPI(api)}
+          initialData={initialAppState}
           theme="light"
         />
       </div>

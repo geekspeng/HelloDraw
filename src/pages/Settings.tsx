@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSettingsStore } from '../stores/settingsStore'
 import ApiConfigForm from '../components/settings/ApiConfigForm'
 import { getAllProjects, saveProject, deleteProject, getVersionsByProject, saveVersion } from '../services/dbService'
-import type { Project, Version } from '../types'
+import type { Version } from '../types'
 
 export default function Settings() {
   const { settings, updateTheme } = useSettingsStore()

@@ -13,7 +13,6 @@ interface DrawioCanvasProps {
 
 export default function DrawioCanvas({ initialData, onChange }: DrawioCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [graph, setGraph] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -39,7 +38,6 @@ export default function DrawioCanvas({ initialData, onChange }: DrawioCanvasProp
       mx.mxClient.create(containerRef.current, {
         assetsPath: 'https://cdnjs.cloudflare.com/ajax/libs/mxgraph/4.2.2/assets/',
         onInit: (graphInstance: any) => {
-          setGraph(graphInstance)
           setLoading(false)
 
           if (initialData) {

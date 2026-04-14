@@ -17,13 +17,13 @@ function parseAIResponse(text: string, engine: string): AIResponse {
 
   switch (engine) {
     case 'mermaid':
-      chartContent = extractCodeBlock(text, 'mermaid') || extractCodeBlock(text, '')
+      chartContent = extractCodeBlock(text, 'mermaid') || extractCodeBlock(text, '') || undefined
       break
     case 'excalidraw':
-      chartContent = extractCodeBlock(text, 'json')
+      chartContent = extractCodeBlock(text, 'json') || undefined
       break
     case 'drawio':
-      chartContent = extractCodeBlock(text, 'xml') || extractCodeBlock(text, 'drawio')
+      chartContent = extractCodeBlock(text, 'xml') || extractCodeBlock(text, 'drawio') || undefined
       break
   }
 

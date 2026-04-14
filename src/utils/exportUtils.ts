@@ -1,7 +1,7 @@
 import mermaid from 'mermaid'
 
 export async function exportMermaidAsSvg(code: string): Promise<string> {
-  mermaid.initialize({ startOnLoad: false, outputSvg: true })
+  mermaid.initialize({ startOnLoad: false })
   const { svg } = await mermaid.render('export-svg', code)
   return svg
 }
