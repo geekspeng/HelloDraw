@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useProjectStore } from '../../stores/projectStore'
 import MermaidPreview from './MermaidPreview'
+import ExcalidrawCanvas from './ExcalidrawCanvas'
+import DrawioCanvas from './DrawioCanvas'
 import ChatPanel from '../chat/ChatPanel'
 import VersionHistory from '../project/VersionHistory'
 import { exportMermaidAsSvg, exportMermaidAsPng, downloadSvg } from '../../utils/exportUtils'
@@ -107,10 +109,10 @@ export default function ChartEditor() {
             <MermaidPreview code={content} className="min-h-full" />
           )}
           {currentProject.engine === 'excalidraw' && (
-            <div className="text-gray-400">Excalidraw 画布（开发中）</div>
+            <ExcalidrawCanvas initialData={content} />
           )}
           {currentProject.engine === 'drawio' && (
-            <div className="text-gray-400">Draw.io 画布（开发中）</div>
+            <DrawioCanvas initialData={content} />
           )}
         </div>
 
