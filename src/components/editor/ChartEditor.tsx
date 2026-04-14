@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useProjectStore } from '../../stores/projectStore'
+import { useChatStore } from '../../stores/chatStore'
 import MermaidPreview from './MermaidPreview'
 import ExcalidrawCanvas from './ExcalidrawCanvas'
 import DrawioCanvas from './DrawioCanvas'
@@ -11,10 +12,12 @@ import { exportMermaidAsSvg, exportMermaidAsPng, downloadSvg } from '../../utils
 export default function ChartEditor() {
   const { projectId } = useParams<{ projectId: string }>()
   const navigate = useNavigate()
-  const { getProject, currentProject, setCurrentProject } = useProjectStore()
+  const { getProject, currentProject, setCurrentProject, updateProject } = useProjectStore()
+  const { messages } = useChatStore()
   const [content, setContent] = useState('')
   const [showHistory, setShowHistory] = useState(false)
   const [exportMenuOpen, setExportMenuOpen] = useState(false)
+  const lastMessageCountRef = useRef(0)
 
   const handleExport = async (format: 'svg' | 'png') => {
     if (currentProject?.engine !== 'mermaid') return
@@ -43,6 +46,21 @@ export default function ChartEditor() {
       }
     }
   }, [projectId, getProject, setCurrentProject, navigate])
+
+  // 更新内容当 AI 返回图表代码时
+  useEffect(() => {
+    if (messages.length > lastMessageCountRef.current) {
+      const lastMessage = messages[messages.length - 1]
+      if (lastMessage.role === 'assistant' && lastMessage.chartContent) {
+        const newContent = lastMessage.chartContent
+        setContent(newContent)
+        if (currentProject) {
+          updateProject(currentProject.id, { content: newContent })
+        }
+      }
+      lastMessageCountRef.current = messages.length
+    }
+  }, [messages, currentProject, updateProject])
 
   const handleRestore = (restoredContent: string) => {
     setContent(restoredContent)
