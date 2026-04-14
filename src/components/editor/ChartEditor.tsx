@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useProjectStore } from '../../stores/projectStore'
 import MermaidPreview from './MermaidPreview'
 import ChatPanel from '../chat/ChatPanel'
+import VersionHistory from '../project/VersionHistory'
 
 export default function ChartEditor() {
   const { projectId } = useParams<{ projectId: string }>()
   const navigate = useNavigate()
   const { getProject, updateProject, currentProject, setCurrentProject } = useProjectStore()
   const [content, setContent] = useState('')
+  const [showHistory, setShowHistory] = useState(false)
 
   useEffect(() => {
     if (projectId) {
@@ -29,6 +31,10 @@ export default function ChartEditor() {
     }
   }
 
+  const handleRestore = (restoredContent: string) => {
+    setContent(restoredContent)
+  }
+
   if (!currentProject) {
     return <div>加载中...</div>
   }
@@ -47,6 +53,12 @@ export default function ChartEditor() {
           {currentProject.name}
         </h1>
         <div className="flex gap-2">
+          <button
+            onClick={() => setShowHistory(true)}
+            className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+          >
+            历史记录
+          </button>
           <button
             onClick={() => {/* TODO: 导出功能 */}}
             className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -76,6 +88,16 @@ export default function ChartEditor() {
           <ChatPanel engine={currentProject.engine} />
         </div>
       </div>
+
+      {/* 版本历史弹窗 */}
+      {showHistory && currentProject && (
+        <VersionHistory
+          projectId={currentProject.id}
+          currentContent={content}
+          onRestore={handleRestore}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
     </div>
   )
 }
