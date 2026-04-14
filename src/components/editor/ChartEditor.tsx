@@ -4,6 +4,7 @@ import { useProjectStore } from '../../stores/projectStore'
 import MermaidPreview from './MermaidPreview'
 import ChatPanel from '../chat/ChatPanel'
 import VersionHistory from '../project/VersionHistory'
+import { exportMermaidAsSvg, exportMermaidAsPng, downloadSvg } from '../../utils/exportUtils'
 
 export default function ChartEditor() {
   const { projectId } = useParams<{ projectId: string }>()
@@ -11,6 +12,23 @@ export default function ChartEditor() {
   const { getProject, updateProject, currentProject, setCurrentProject } = useProjectStore()
   const [content, setContent] = useState('')
   const [showHistory, setShowHistory] = useState(false)
+  const [exportMenuOpen, setExportMenuOpen] = useState(false)
+
+  const handleExport = async (format: 'svg' | 'png') => {
+    if (currentProject?.engine !== 'mermaid') return
+
+    try {
+      if (format === 'svg') {
+        const svg = await exportMermaidAsSvg(content)
+        downloadSvg(svg, `${currentProject.name}.svg`)
+      } else {
+        await exportMermaidAsPng(content)
+      }
+    } catch (err) {
+      console.error('Export failed:', err)
+    }
+    setExportMenuOpen(false)
+  }
 
   useEffect(() => {
     if (projectId) {
@@ -59,12 +77,32 @@ export default function ChartEditor() {
           >
             历史记录
           </button>
-          <button
-            onClick={() => {/* TODO: 导出功能 */}}
-            className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-          >
-            导出
-          </button>
+          {currentProject?.engine === 'mermaid' && (
+            <div className="relative">
+              <button
+                onClick={() => setExportMenuOpen(!exportMenuOpen)}
+                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                导出 ▾
+              </button>
+              {exportMenuOpen && (
+                <div className="absolute right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
+                  <button
+                    onClick={() => handleExport('svg')}
+                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    导出 SVG
+                  </button>
+                  <button
+                    onClick={() => handleExport('png')}
+                    className="block w-full px-4 py-2 text-sm text-left hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    导出 PNG
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
