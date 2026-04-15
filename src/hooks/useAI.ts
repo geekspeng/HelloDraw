@@ -1,12 +1,20 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useChatStore } from '../stores/chatStore'
 import { useSettingsStore } from '../stores/settingsStore'
 import { sendMessage } from '../services/aiService'
 
 export function useAI() {
-  const { messages, addMessage, clearMessages, setLoading, isLoading } = useChatStore()
+  const addMessage = useChatStore((s) => s.addMessage)
+  const setLoading = useChatStore((s) => s.setLoading)
+  const isLoading = useChatStore((s) => s.isLoading)
+  const messagesRef = useRef(useChatStore.getState().messages)
   const { settings } = useSettingsStore()
   const [error, setError] = useState<string | null>(null)
+
+  // 保持 messagesRef 与 store 同步
+  useChatStore.subscribe((state) => {
+    messagesRef.current = state.messages
+  })
 
   const send = useCallback(
     async (content: string, engine: string) => {
@@ -21,7 +29,8 @@ export function useAI() {
       try {
         addMessage('user', content)
 
-        const history = messages.map((m) => ({
+        // 使用 ref 获取最新的消息列表
+        const history = messagesRef.current.map((m) => ({
           role: m.role,
           content: m.chartContent || m.content,
         }))
@@ -34,8 +43,8 @@ export function useAI() {
         setLoading(false)
       }
     },
-    [settings.aiConfig, messages, addMessage, setLoading]
+    [settings.aiConfig, addMessage, setLoading]
   )
 
-  return { send, isLoading, error, clearMessages }
+  return { send, isLoading, error }
 }

@@ -12,8 +12,8 @@ export default function Home() {
   const [selectedEngine, setSelectedEngine] = useState<EngineType>('mermaid')
   const [prompt, setPrompt] = useState('')
 
-  const handleQuickGenerate = () => {
-    const project = addProject(`新图表 ${Date.now()}`, selectedEngine)
+  const handleQuickGenerate = async () => {
+    const project = await addProject(`新图表 ${Date.now()}`, selectedEngine)
     navigate(`/editor/${project.id}`)
   }
 

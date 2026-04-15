@@ -13,6 +13,7 @@ export default function ChartEditor() {
   const { projectId } = useParams<{ projectId: string }>()
   const navigate = useNavigate()
   const { getProject, currentProject, setCurrentProject, updateProject } = useProjectStore()
+  const { setProjectId } = useChatStore()
   const { messages } = useChatStore()
   const [content, setContent] = useState('')
   const [showHistory, setShowHistory] = useState(false)
@@ -27,7 +28,7 @@ export default function ChartEditor() {
         const svg = await exportMermaidAsSvg(content)
         downloadSvg(svg, `${currentProject.name}.svg`)
       } else {
-        await exportMermaidAsPng(content)
+        await exportMermaidAsPng(content, `${currentProject.name}.png`)
       }
     } catch (err) {
       console.error('Export failed:', err)
@@ -41,11 +42,13 @@ export default function ChartEditor() {
       if (project) {
         setCurrentProject(project)
         setContent(project.content)
+        // 切换项目时重置对话上下文
+        setProjectId(projectId)
       } else {
         navigate('/')
       }
     }
-  }, [projectId, getProject, setCurrentProject, navigate])
+  }, [projectId, getProject, setCurrentProject, setProjectId, navigate])
 
   // 更新内容当 AI 返回图表代码时
   useEffect(() => {
